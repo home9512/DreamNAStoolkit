@@ -16,13 +16,13 @@ $Systemdisk = Get-PSDrive -Name C
 
 # 設定下載 URL 和儲存路徑
 $FilePack = @(
-	"Software_Toolkit_Windows_10_11_v2025.exe",
+	"Normalversion_Software_Toolkit_Windows_10_11_v2026.exe",
 	"Software_Toolkit.zip",
 	"7z.zip"
 )
 $FileHash = @(
-	"B1C72F669E2E6E8DEFDFC6A22604C2718AE2095EB2C21C10748DC7BA06F31DD0",
-	"4d13d3c58846ebbbfc37c11e9459bbb5af4921907368f21d647f74ab2a89e7e9",
+	"f38e5dff07a0e060b917703774f4b617a5a709192199fd99b04349cb20f663ab",
+	"1c409fcb1b524ea4e9c9904d266d7e1fd1ac2896a7f4a97d02a82eff59f08882",
 	"CE5875A8AB8937C0102F2AF79E644E320E56D1C46C7332FD6C8A0B68B25B72F9"
 )
 
