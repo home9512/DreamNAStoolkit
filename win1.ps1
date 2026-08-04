@@ -1,5 +1,5 @@
 # ==============================================================================
-# ☆Dream-NAS☆ 可愛版 Windows Toolkit 自動下載與校驗腳本
+# ☆Dream-NAS☆ 可愛版 Windows Toolkit 自動下載與校驗腳本 (修復網址斜線版)
 # ==============================================================================
 
 # 1. 自動檢查並主動提升為系統管理員（Admin）權限
@@ -43,8 +43,8 @@ function Download_And_Verify {
         [string]$File,
         [string]$Hash
     )
-    # 【安全修正】避免使用 += 導致全域變數網址在迴圈中被錯誤疊加
-    $Source = "${UrlHost}${UrlBody}${File}"
+    # 【已修復】在 UrlHost 和 UrlBody 之間加上正確的斜線 /，確保網址完全正確
+    $Source = "${UrlHost}/${UrlBody}${File}"
     $Target = Join-Path -Path $TargetRoot -ChildPath $File
 
     if (!(Test-Path $Target)) {
