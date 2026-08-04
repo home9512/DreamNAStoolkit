@@ -1,4 +1,3 @@
-# Check if running as administrator
 if (! ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
 	# 取得目前腳本的完整路徑
 	$scriptPath = $MyInvocation.MyCommand.Definition
