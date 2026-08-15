@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "=========================================="
-echo "  RT-AX86U 網頁後台功率顯示補丁安裝腳本"
+echo "  RT-AX86U 網頁後台功率顯示補丁 (Network修正版)"
 echo "=========================================="
 
 # 1. 建立核心網頁注入與動態更新腳本
@@ -26,12 +26,13 @@ mW_5G=$(awk -v dbm="$PWR_5G" 'BEGIN {print int(10^(dbm/10))}')
 # 3) 建立網頁影子快取，避免直接改動唯讀系統
 cp /www/Tools_Sysinfo.asp /tmp/Tools_Sysinfo_custom.asp
 
-# 4) 尋找 Network 頁面的分頁結尾（connections_html 標籤），在前方精確插入 HTML 表格行
-sed -i "/connections_html/i \
-<tr><th>2.4GHz 無線發射功率<\/th><td><span style='color:#00ffcc;font-weight:bold;'>$PWR_2G dBm<\/span> ($mW_2G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>\
-<tr><th>5GHz 無線發射功率<\/th><td><span style='color:#ff00ff;font-weight:bold;'>$PWR_5G dBm<\/span> ($mW_5G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>" /tmp/Tools_Sysinfo_custom.asp
+# 4) 核心定位：精確瞄準你畫面最下方的「Wireless Clients (5 GHz)」這一行，在它的下方直接插入兩行全新數據
+sed -i "/Wireless Clients (5 GHz)/{n;a \\
+<tr><th>2.4GHz 無線發射功率<\/th><td><span style='color:#00ffcc;font-weight:bold;'>$PWR_2G dBm<\/span> ($mW_2G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>\\
+<tr><th>5GHz 無線發射功率<\/th><td><span style='color:#ff00ff;font-weight:bold;'>$PWR_5G dBm<\/span> ($mW_5G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>
+}" /tmp/Tools_Sysinfo_custom.asp
 
-# 5) 核心安全步驟：用修改後的影子網頁動態綁定覆蓋原廠網頁
+# 5) 用修改後的影子網頁動態綁定覆蓋原廠網頁
 mount --bind /tmp/Tools_Sysinfo_custom.asp /www/Tools_Sysinfo.asp
 EOF
 
@@ -52,8 +53,5 @@ chmod +x /jffs/scripts/services-start
 /bin/sh /jffs/scripts/sysinfo-patch.sh
 
 echo "------------------------------------------"
-echo " 🎉 網頁補丁部署完畢！"
-echo " 正在動態刷新網頁組件中，請等待 3 秒鐘..."
-echo "------------------------------------------"
-echo " 請重新整理你的華碩後台網頁，前往「System Info -> Network」查看成果！"
+echo " 🎉 網頁補丁更新部署完畢！"
 echo "=========================================="
