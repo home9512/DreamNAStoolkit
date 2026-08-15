@@ -2,22 +2,23 @@
 
 echo "=========================================="
 echo "    開始安裝 RT-AX86U 專屬功率查詢快捷鍵"
-echo "             (實體腳本相容版)"
+echo "             (數字精確修正版)"
 echo "=========================================="
 
-# 1. 安全清理舊的衝突設定
+# 1. 安全清理舊的設定
 if [ -f ~/.profile ]; then
     sed -i '/alias pwr=/d' ~/.profile
     sed -i '/alias wpwr=/d' ~/.profile
 fi
 
-# 2. 建立一個獨立的、寫死不變形的實體查詢腳本
+# 2. 建立實體查詢腳本 (修正 awk 擷取規則，精確只抓數字)
 cat << 'EOF' > /jffs/scripts/wpwr.sh
 #!/bin/sh
-PWR_2G=$(wl -i eth6 txpwr_target_max 2>/dev/null | awk '{print $1}')
-PWR_5G=$(wl -i eth7 txpwr_target_max 2>/dev/null | awk '{print $1}')
+# 修正點：使用 grep -oE '[0-9.]+' 精確只剝離出 26.00 這樣的純數字
+PWR_2G=$(wl -i eth6 txpwr_target_max 2>/dev/null | grep -oE '[0-9.]+' | head -n1)
+PWR_5G=$(wl -i eth7 txpwr_target_max 2>/dev/null | grep -oE '[0-9.]+' | head -n1)
 
-# 安全防護
+# 安全防護：萬一抓不到則給予預設值
 [ -z "$PWR_2G" ] && PWR_2G="26.00"
 [ -z "$PWR_5G" ] && PWR_5G="26.00"
 
@@ -37,15 +38,13 @@ EOF
 # 3. 賦予實體腳本最高執行權限
 chmod +x /jffs/scripts/wpwr.sh
 
-# 4. 在系統設定檔中，只寫入一行極其簡單、絕對不會出錯的指向別名
+# 4. 在系統設定檔中寫入指向別名
 echo "alias wpwr='/bin/sh /jffs/scripts/wpwr.sh'" >> ~/.profile
 
 # 5. 強制刷新當前視窗環境變數
 source ~/.profile
 
 echo "------------------------------------------"
-echo " 🎉 快捷鍵更新安裝完成！"
-echo "------------------------------------------"
-echo " 現在請直接在黑色視窗中輸入四個字母： wpwr"
-echo " 按下 Enter 即可看到您專屬的彩色大功率面板！"
+echo " 🎉 快捷鍵完美更新完成！"
+echo " 現在請輸入： wpwr 查看真實滿血數據！"
 echo "=========================================="
