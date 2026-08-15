@@ -2,25 +2,25 @@
 
 echo "=========================================="
 echo "   RT-AX86U USB-JFFS 記憶體轉移安裝腳本"
-echo "        (Silicon-Power32G 專用版)"
+echo "             (sda1 修正版)"
 echo "=========================================="
 
-USB_TARGET="/tmp/mnt/Silicon-Power32G"
+USB_TARGET="/tmp/mnt/sda1"
 
 # 1. 核心安全檢查：確認隨身碟是否在線上
 if [ ! -d "$USB_TARGET" ]; then
-    echo "❌ 錯誤：找不到隨身碟儲存路徑！"
-    echo "請確認隨身碟標籤名稱是否為 Silicon-Power32G，且已正確格式化並插在路由器上。"
+    echo "❌ 錯誤：找不到隨身碟儲存路徑 /tmp/mnt/sda1！"
+    echo "請確認隨身碟是否正確插在路由器上。"
     exit 1
 fi
 
-echo "✅ 偵測到 Silicon-Power32G 隨身碟，開始部署..."
+echo "✅ 偵測到隨身碟路徑 sda1，開始部署..."
 
 # 2. 建立隨身碟專屬 post-mount 自動綁定腳本
 cat << 'EOF' > /jffs/scripts/post-mount
 #!/bin/sh
-# 鎖定 Silicon-Power32G 隨身碟實體路徑
-USB_PATH="/tmp/mnt/Silicon-Power32G"
+# 鎖定 sda1 隨身碟實體路徑
+USB_PATH="/tmp/mnt/sda1"
 
 if [ -d "$USB_PATH" ]; then
     # 建立隨身碟上的隱藏快閃資料夾
