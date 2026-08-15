@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "=========================================="
-echo "  RT-AX86U 網頁後台功率顯示補丁 (終極定位版)"
+echo "  RT-AX86U 網頁後台功率顯示補丁 (完美相容版)"
 echo "=========================================="
 
 # 1. 建立核心網頁注入與動態更新腳本
@@ -23,13 +23,13 @@ PWR_5G=$(wl -i eth7 txpwr_target_max 2>/dev/null | awk '{print $1}')
 mW_2G=$(awk -v dbm="$PWR_2G" 'BEGIN {print int(10^(dbm/10))}')
 mW_5G=$(awk -v dbm="$PWR_5G" 'BEGIN {print int(10^(dbm/10))}')
 
-# 3) 建立網頁影子快取，避免直接改動唯讀系統
+# 3) 建立網頁影子快取
 cp /www/Tools_Sysinfo.asp /tmp/Tools_Sysinfo_custom.asp
 
-# 4) 終極定位：直接瞄準原廠 Network 表格的動態 JavaScript 代碼結尾，強行追加兩行純 HTML 表格欄位
-sed -i "/_connections_html/a \\
-\t\t\t\t\thtmlcode += '<tr><th>2.4GHz 無線發射功率<\/th><td><span style=\"color:#00ffcc;font-weight:bold;\">$PWR_2G dBm<\/span> ($mW_2G mW) <span style=\"color:#ffcc00;font-size:11px;margin-left:8px;\">[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>';\\
-\t\t\t\t\thtmlcode += '<tr><th>5GHz 無線發射功率<\/th><td><span style=\"color:#ff00ff;font-weight:bold;\">$PWR_5G dBm<\/span> ($mW_5G mW) <span style=\"color:#ffcc00;font-size:11px;margin-left:8px;\">[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>';" /tmp/Tools_Sysinfo_custom.asp
+# 4) 完美定位：直接在網頁底部 Network 表格的最下方（結尾標籤處）強制插入兩行純 HTML 表格欄位
+sed -i "/<\/table>/i \\
+<tr><th>2.4GHz 無線發射功率<\/th><td><span style='color:#00ffcc;font-weight:bold;'>$PWR_2G dBm<\/span> ($mW_2G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>\\
+<tr><th>5GHz 無線發射功率<\/th><td><span style='color:#ff00ff;font-weight:bold;'>$PWR_5G dBm<\/span> ($mW_5G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>" /tmp/Tools_Sysinfo_custom.asp
 
 # 5) 用修改後的影子網頁動態綁定覆蓋原廠網頁
 mount --bind /tmp/Tools_Sysinfo_custom.asp /www/Tools_Sysinfo.asp
