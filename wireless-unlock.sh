@@ -4,7 +4,7 @@ echo "=========================================="
 echo "    開始安裝 RT-AX86U 梅林大功率解鎖腳本"
 echo "=========================================="
 
-# 1. 建立核心解鎖腳本
+# 1. 建立核心解鎖腳本 (修正 rc_service 錯誤)
 cat << 'EOF' > /jffs/scripts/wireless-unlock.sh
 #!/bin/sh
 # 確保系統開機無線晶片初始化完成
@@ -20,8 +20,8 @@ nvram set wl0_reg_mode=h
 nvram set wl1_reg_mode=h
 nvram commit
 
-# 重新載入無線驅動，使功率即時生效
-rc_service restart_wireless
+# 修正：使用標準命令重新載入無線服務
+service restart_wireless
 EOF
 
 # 2. 賦予解鎖腳本執行權限
