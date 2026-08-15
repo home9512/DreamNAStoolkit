@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "=========================================="
-echo "  RT-AX86U 網頁後台功率顯示補丁 (完美相容版)"
+echo "  RT-AX86U 網頁後台功率顯示補丁 (終極不翻車版)"
 echo "=========================================="
 
 # 1. 建立核心網頁注入與動態更新腳本
@@ -26,10 +26,21 @@ mW_5G=$(awk -v dbm="$PWR_5G" 'BEGIN {print int(10^(dbm/10))}')
 # 3) 建立網頁影子快取
 cp /www/Tools_Sysinfo.asp /tmp/Tools_Sysinfo_custom.asp
 
-# 4) 完美定位：直接在網頁底部 Network 表格的最下方（結尾標籤處）強制插入兩行純 HTML 表格欄位
-sed -i "/<\/table>/i \\
-<tr><th>2.4GHz 無線發射功率<\/th><td><span style='color:#00ffcc;font-weight:bold;'>$PWR_2G dBm<\/span> ($mW_2G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>\\
-<tr><th>5GHz 無線發射功率<\/th><td><span style='color:#ff00ff;font-weight:bold;'>$PWR_5G dBm<\/span> ($mW_5G mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]<\/span><\/td><\/tr>" /tmp/Tools_Sysinfo_custom.asp
+# 4) 終極追加法：完全放棄 sed 定位，直接把 HTML 彩色表格附加到整個網頁的最底部！
+cat << WEBEOF >> /tmp/Tools_Sysinfo_custom.asp
+<script>
+setTimeout(function(){
+    var tbl = document.getElementsByTagName('table');
+    if(tbl && tbl.length > 0){
+        var lastTbl = tbl[tbl.length - 1];
+        var row1 = lastTbl.insertRow(-1);
+        row1.innerHTML = "<th>2.4GHz 無線發射功率</th><td><span style='color:#00ffcc;font-weight:bold;'>" + "$PWR_2G" + " dBm</span> (" + "$mW_2G" + " mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]</span></td>";
+        var row2 = lastTbl.insertRow(-1);
+        row2.innerHTML = "<th>5GHz 無線發射功率</th><td><span style='color:#ff00ff;font-weight:bold;'>" + "$PWR_5G" + " dBm</span> (" + "$mW_5G" + " mW) <span style='color:#ffcc00;font-size:11px;margin-left:8px;'>[ 滿血解鎖 🚀 ]</span></td>";
+    }
+}, 500);
+</script>
+WEBEOF
 
 # 5) 用修改後的影子網頁動態綁定覆蓋原廠網頁
 mount --bind /tmp/Tools_Sysinfo_custom.asp /www/Tools_Sysinfo.asp
