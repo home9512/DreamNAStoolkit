@@ -12,9 +12,9 @@ sleep 20
 
 # 寫入全球滿血大功率區域代碼
 nvram set territory_code=AA
-nvram set wl_country_code=AU
-nvram set wl0_country_code=AU
-nvram set wl1_country_code=AU
+nvram set wl_country_code=US
+nvram set wl0_country_code=US
+nvram set wl1_country_code=US
 nvram set location_code=#a
 nvram set wl0_reg_mode=h
 nvram set wl1_reg_mode=h
