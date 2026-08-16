@@ -2,7 +2,7 @@
 
 echo "=========================================="
 echo "   RT-AX86U USB-JFFS 記憶體轉移安裝腳本"
-echo "             (sda1 修正版)"
+echo "             (安全資料同步版)"
 echo "=========================================="
 
 USB_TARGET="/tmp/mnt/sda1"
@@ -16,28 +16,26 @@ fi
 
 echo "✅ 偵測到隨身碟路徑 sda1，開始部署..."
 
-# 2. 建立隨身碟專屬 post-mount 自動綁定腳本
+# 🌟 安全修正：在安裝當下，立刻將現在路由器內的所有 JFFS 設定與腳本（含無線解鎖）同步到隨身碟
+echo "📦 正在備份並同步現有 JFFS 資料至隨身碟..."
+mkdir -p "$USB_TARGET/.jffs"
+cp -a /jffs/. "$USB_TARGET/.jffs/"
+
+# 2. 建立隨身碟專屬 post-mount 自動綁定腳本（開機只需單純綁定，最穩定）
 cat << 'EOF' > /jffs/scripts/post-mount
 #!/bin/sh
 # 鎖定 sda1 隨身碟實體路徑
 USB_PATH="/tmp/mnt/sda1"
 
-if [ -d "$USB_PATH" ]; then
-    # 建立隨身碟上的隱藏快閃資料夾
-    mkdir -p "$USB_PATH/.jffs"
-    
-    # 🌟 防遺失機制：若隨身碟上沒有大功率解鎖腳本，自動從路由器內部快閃記憶體中複製過去
-    if [ ! -f "$USB_PATH/.jffs/scripts/wireless-unlock.sh" ] && [ -f /jffs/scripts/wireless-unlock.sh ]; then
-        cp -a /jffs/. "$USB_PATH/.jffs/"
-    fi
-    
+if [ -d "$USB_PATH/.jffs" ]; then
     # 將系統核心 /jffs 徹底綁定到隨身碟上，保護原廠 Flash
     mount --bind "$USB_PATH/.jffs" /jffs
 fi
 EOF
 
-# 3. 賦予腳本最高執行權限
+# 3. 系統安全同步：確保把剛剛複製的檔案跟 post-mount 腳本寫入 Flash 晶片
 chmod +x /jffs/scripts/post-mount
+sync
 
 echo "------------------------------------------"
 echo " 🎉 安裝成功！"
